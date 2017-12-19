@@ -5,7 +5,7 @@ class MoviesController < ApplicationController
     if params[:query]
       data = MovieWrapper.search(params[:query])
     else
-      data = Movie.all
+      data = Movie.all.order(created_at: :desc)
     end
 
     render status: :ok, json: data
@@ -21,7 +21,17 @@ class MoviesController < ApplicationController
       )
   end
 
+  def create
+    movie = Movie.new(movie_params)
+    movie.save
+    render status: :ok, json: movie
+  end
+
   private
+
+  def movie_params
+    params.require(:movie).permit(:title, :overview, :release_date, :image_url)
+  end
 
   def require_movie
     @movie = Movie.find_by(title: params[:title])
